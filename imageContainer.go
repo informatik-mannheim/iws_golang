@@ -2,6 +2,7 @@ package iws_golang
 
 import (
 	"math"
+	"sync"
 )
 
 const (
@@ -15,6 +16,7 @@ type ImageData struct {
 	PixelData  []int
 	Width      int
 	Height     int
+	workerList sync.WaitGroup
 }
 
 // NewImageData returns new instance of ImageData

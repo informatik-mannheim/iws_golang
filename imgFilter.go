@@ -43,14 +43,19 @@ func colorFilterGenerator(index int, value float64) func(imgData *ImageData) err
 		}
 
 		maxColVal := 255.0
-		for i := 0; i < len(imgData.PixelData); i += imgData.Width * 3 {
-			start := i+index;
-			for l := start; l < (start + 3*imgData.Width); l += 3 {
-				colVal := float64(imgData.PixelData[l]) * value
-				imgData.PixelData[l] = int(math.Floor(math.Min(maxColVal, colVal)))
-			}
+		for i := 0; i < len(imgData.PixelData); i += imgData.Height * 3 {
+			imgData.workerList.Add(1)
+			go func(start int, imgData *ImageData) {
+				defer imgData.workerList.Done()
+				for l := start; l < (start + 3*imgData.Height); l += 3 {
+					colVal := float64(imgData.PixelData[l]) * value
+					imgData.PixelData[l] = int(math.Floor(math.Min(maxColVal, colVal)))
+				}
+
+			}(i+index, imgData)
 		}
 
+		imgData.workerList.Wait()
 		return nil
 	}
 }
