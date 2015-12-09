@@ -35,15 +35,20 @@ func colorCollage(src, dest string) {
 	imageChan := make(chan *ImageData, 4)
 	for i := 0; i < 4; i++ {
 		tmpDest := filepath.Join(filepath.Dir(dest), "img_" + strconv.Itoa(i) + ".bmp")
-		go func(origin *ImageData, filter []float64, dest *string) {
-			imgData := origin.Copy()
-			imgData.Filter(GreenFilterGenerator(filter[0]))
-			imgData.Filter(RedFilterGenerator(filter[1]))
-			imgData.Filter(BlueFilterGenerator(filter[2]))
+		go func(filter []float64, isCopy bool) {
+			var newImgData *ImageData
+			if(isCopy) {
+				newImgData = imgData.Copy()
+			} else {
+				newImgData = imgData;
+			}
+			newImgData.Filter(GreenFilterGenerator(filter[0]))
+			newImgData.Filter(RedFilterGenerator(filter[1]))
+			newImgData.Filter(BlueFilterGenerator(filter[2]))
 			
-			imgData.SaveFile(*dest)
-			imageChan <- imgData
-		}(imgData, colorCollection[i*3:i*3+3], &tmpDest)
+			newImgData.SaveFile(tmpDest)
+			imageChan <- newImgData
+		}(colorCollection[i*3:i*3+3], i<3)
 	}
 	
 	imgData1 := <- imageChan
