@@ -12,7 +12,7 @@ type Index struct {
 	}
 }
 
-//NewIndex returns a new Instance of index
+//NewIndex returns a new Instance of Index
 func NewIndex(sampleString string) (index *Index){
 	index = &Index{}
 	index.Main.SampleString = sampleString
@@ -27,11 +27,24 @@ type Show struct {
 	}
 }
 
-//NewShow returns a new Instance of show
+//NewShow returns a new Instance of Show
 func NewShow(sampleString, href, filter string) (show *Show){
 	show = &Show{}
 	show.Main.SampleString = sampleString
 	show.Main.Href = href
 	show.Main.Filter = filter
+	return 
+}
+
+//NotFound is Struct to parse 404.html
+type NotFound struct {
+	Base base
+	Main string
+}
+
+//NewNotFound returns a new Instance of NotFound
+func NewNotFound(message string) (notFound *NotFound){
+	notFound = &NotFound{}
+	notFound.Main = message
 	return 
 }
