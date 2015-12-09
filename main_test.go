@@ -25,34 +25,33 @@ func grayFiler(src, dest string) {
 func colorCollage(src, dest string) {
 
 	imgData1 := NewImageData()
+	colorCollection := [...]float64{1.2, 0.7, 0.7, 0.7, 1.8, 0.7, 0.7, 0.7, 1.8, 0.3, 1.6, 1.6}
 	if err := imgData1.LoadFile(src); err != nil {
 		panic(err.Error())
 	}
+	
+	imageChan := make(chan *ImageData, 1)
+	for i := 1; i < 4; i++ {
+		go func(origin *ImageData, filter []float64) {
+			imgData := origin.Copy()
+			imgData.Filter(GreenFilterGenerator(filter[0]))
+			imgData.Filter(RedFilterGenerator(filter[1]))
+			imgData.Filter(BlueFilterGenerator(filter[2]))
+			imageChan <- imgData
+		}(imgData1, colorCollection[i*3:i*3+3])
+	}
+	
+	imgData1.Filter(GreenFilterGenerator(colorCollection[0]))
+	imgData1.Filter(RedFilterGenerator(colorCollection[1]))
+	imgData1.Filter(BlueFilterGenerator(colorCollection[2]))
+	
+	
+	
+	imgData1.AssembleLeft(<- imageChan)
+	imgData2 := <- imageChan
+	imgData2.AssembleLeft(<- imageChan)
 
-	imgData2 := imgData1.Copy()
-	imgData3 := imgData1.Copy()
-	imgData4 := imgData1.Copy()
-
-	imgData1.Filter(GreenFilterGenerator(1.2))
-	imgData1.Filter(RedFilterGenerator(0.7))
-	imgData1.Filter(BlueFilterGenerator(0.7))
-
-	imgData2.Filter(GreenFilterGenerator(0.7))
-	imgData2.Filter(RedFilterGenerator(1.8))
-	imgData2.Filter(BlueFilterGenerator(0.7))
-
-	imgData3.Filter(GreenFilterGenerator(0.7))
-	imgData3.Filter(RedFilterGenerator(0.7))
-	imgData3.Filter(BlueFilterGenerator(1.8))
-
-	imgData4.Filter(GreenFilterGenerator(0.3))
-	imgData4.Filter(RedFilterGenerator(1.6))
-	imgData4.Filter(BlueFilterGenerator(1.6))
-
-	imgData1.AssembleLeft(imgData2)
-	imgData3.AssembleLeft(imgData4)
-
-	imgData1.AssembleTop(imgData3)
+	imgData1.AssembleTop(imgData2)
 
 	if err := imgData1.SaveFile(dest); err != nil {
 		panic(err.Error())
