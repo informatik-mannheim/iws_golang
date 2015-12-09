@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"path/filepath"
 	"testing"
 )
 
@@ -37,17 +38,38 @@ func colorCollage(src, dest string) {
 	imgData1.Filter(RedFilterGenerator(0.7))
 	imgData1.Filter(BlueFilterGenerator(0.7))
 
+	dest1 := filepath.Join(filepath.Dir(dest), "img_1.bmp")
+	if err := imgData1.SaveFile(dest1); err != nil {
+		panic(err.Error())
+	}
+
 	imgData2.Filter(GreenFilterGenerator(0.7))
 	imgData2.Filter(RedFilterGenerator(1.8))
 	imgData2.Filter(BlueFilterGenerator(0.7))
+	
+	dest2 := filepath.Join(filepath.Dir(dest), "img_2.bmp")
+	if err := imgData2.SaveFile(dest2); err != nil {
+		panic(err.Error())
+	}
+
 
 	imgData3.Filter(GreenFilterGenerator(0.7))
 	imgData3.Filter(RedFilterGenerator(0.7))
 	imgData3.Filter(BlueFilterGenerator(1.8))
-
+	
+	dest3 := filepath.Join(filepath.Dir(dest), "img_3.bmp")
+	if err := imgData3.SaveFile(dest3); err != nil {
+		panic(err.Error())
+	}
+	
 	imgData4.Filter(GreenFilterGenerator(0.3))
 	imgData4.Filter(RedFilterGenerator(1.6))
 	imgData4.Filter(BlueFilterGenerator(1.6))
+
+	dest4 := filepath.Join(filepath.Dir(dest), "img_4.bmp")
+	if err := imgData4.SaveFile(dest4); err != nil {
+		panic(err.Error())
+	}
 
 	imgData1.AssembleLeft(imgData2)
 	imgData3.AssembleLeft(imgData4)
