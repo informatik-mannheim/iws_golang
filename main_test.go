@@ -104,6 +104,6 @@ func TestMain(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	grayFiler(path.Join(dir, "/test/pictures/bridge.bmp"), path.Join(usr.HomeDir, "Desktop/bridgecollor.bmp"))
+	colorCollage(path.Join(dir, "/test/pictures/bridge.bmp"), path.Join(usr.HomeDir, "Desktop/bridgecollor.bmp"))
 
 }
