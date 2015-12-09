@@ -90,7 +90,7 @@ int c_writeDataToImageFile(int *data, char *fileName, int width, int height) {
 
 	fwrite(bmpfileheader, 1, 14, f);
 	fwrite(bmpinfoheader, 1, 40, f);
-	printf("Hallo ##### %d", restHeaderSize);
+	
 	if(restHeaderSize > 0) {
 		unsigned char restHeader[restHeaderSize];
 		for(int i = 0; i < restHeaderSize; i++) {
@@ -102,6 +102,7 @@ int c_writeDataToImageFile(int *data, char *fileName, int width, int height) {
 
 	for (int i = 0; i < height; i++) {
 		fwrite(img + width * i * 3, 3, width, f);
+		fwrite(bmppad, 1, (4 - (width * 3) % 4) % 4, f);
 	}
 
 	free(img);
