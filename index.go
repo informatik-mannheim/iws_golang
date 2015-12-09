@@ -4,10 +4,8 @@ import (
 	"errors"
 	"html/template"
 	"net/http"
-	"path/filepath"
 	"strings"
-
-	"github.com/informatik-mannheim/iws_golang/iwsimage"
+	_ "github.com/informatik-mannheim/iws_golang/iwsimage"
 	"github.com/informatik-mannheim/iws_golang/viewModel"
 	"github.com/starmanmartin/simple-router"
 	"github.com/starmanmartin/simple-router/view"
@@ -35,23 +33,11 @@ func uploadImage(w http.ResponseWriter, r *router.Request) (bool, error) {
 	image, has := r.Files["image"]
 
 	if has && strings.HasSuffix(image.Mime, "bmp") {
-		iData := iwsimage.NewImageData()
-		iData.LoadFile(filepath.Join(image.Path, image.Name))
-		switch filter {
-		case "gray":
-			iData.Filter(iwsimage.GrayFilter)
-		default:
-			iData.Filter(iwsimage.BlueFilterGenerator(10))
-		}
-
-		iData.SaveFile(filepath.Join(publicPath, "img", image.Name))
-
-		showTemplate.ExecuteTemplate(w, "base", viewModel.NewShow("Martin", "public/img/"+image.Name, filter))
-		return false, nil
+		
 	}
 
 	indexTemplate.ExecuteTemplate(w, "base", viewModel.NewIndex("Starman"))
-	return false, errors.New("No image")
+	return false, errors.New("No image Filter: " + filter)
 }
 
 func main() {
@@ -62,9 +48,8 @@ func main() {
 	router.ErrorHandler = onError
 	app := router.NewRouter()
 	app.Post("/*", app.UploadPath("upload", false))
-	app.Get("/", getIndex)
-	app.Post("/upload", uploadImage)
 	publicPath = app.Public("/public")
+	app.Get("/", getIndex)
 
 	http.ListenAndServe(":8080", app)
 }
