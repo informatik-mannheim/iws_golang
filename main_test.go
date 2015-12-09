@@ -54,6 +54,8 @@ func colorCollage(src, dest string) {
 
 	imgData1.AssembleTop(imgData3)
 
+	imgData1.AssembleOverlayer(imgData1)
+
 	if err := imgData1.SaveFile(dest); err != nil {
 		panic(err.Error())
 	}
