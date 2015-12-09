@@ -5,7 +5,9 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"path/filepath"
 	"testing"
+	"strconv"
 )
 
 func grayFiler(src, dest string) {
@@ -24,28 +26,27 @@ func grayFiler(src, dest string) {
 
 func colorCollage(src, dest string) {
 
-	imgData1 := NewImageData()
+	imgData := NewImageData()
 	colorCollection := [...]float64{1.2, 0.7, 0.7, 0.7, 1.8, 0.7, 0.7, 0.7, 1.8, 0.3, 1.6, 1.6}
-	if err := imgData1.LoadFile(src); err != nil {
+	if err := imgData.LoadFile(src); err != nil {
 		panic(err.Error())
 	}
 	
-	imageChan := make(chan *ImageData, 1)
-	for i := 1; i < 4; i++ {
-		go func(origin *ImageData, filter []float64) {
+	imageChan := make(chan *ImageData, 4)
+	for i := 0; i < 4; i++ {
+		tmpDest := filepath.Join(filepath.Dir(dest), "img_" + strconv.Itoa(i) + ".bmp")
+		go func(origin *ImageData, filter []float64, dest *string) {
 			imgData := origin.Copy()
 			imgData.Filter(GreenFilterGenerator(filter[0]))
 			imgData.Filter(RedFilterGenerator(filter[1]))
 			imgData.Filter(BlueFilterGenerator(filter[2]))
+			
+			imgData.SaveFile(*dest)
 			imageChan <- imgData
-		}(imgData1, colorCollection[i*3:i*3+3])
+		}(imgData, colorCollection[i*3:i*3+3], &tmpDest)
 	}
 	
-	imgData1.Filter(GreenFilterGenerator(colorCollection[0]))
-	imgData1.Filter(RedFilterGenerator(colorCollection[1]))
-	imgData1.Filter(BlueFilterGenerator(colorCollection[2]))
-	
-	
+	imgData1 := <- imageChan
 	
 	imgData1.AssembleLeft(<- imageChan)
 	imgData2 := <- imageChan
