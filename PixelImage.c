@@ -102,6 +102,7 @@ int c_writeDataToImageFile(int *data, char *fileName, int width, int height) {
 
 	for (int i = 0; i < height; i++) {
 		fwrite(img + width * i * 3, 3, width, f);
+		fwrite(bmppad, 1, (4 - (width * 3) % 4) % 4, f);
 	}
 
 	free(img);
