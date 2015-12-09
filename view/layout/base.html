@@ -1,0 +1,32 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>IWS</title>
+  <script type="text/javascript" src="/public/lib/jquery/dist/jquery.min.js"></script>
+  <script type="text/javascript" src="/public/js/index.js"></script>
+</head>
+
+<body>
+
+  <header>
+    <h1>IWS</h1>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <article id="content">
+    {{template "content" .Main}}
+  </article>
+
+  <footer>
+    &copy; Copyright 2015 by golang-IWS Team.
+  </footer>
+</body>
+
+</html>
+{{end}}
