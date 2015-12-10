@@ -1,4 +1,4 @@
-package iws_golang
+package iwsimage
 
 import (
 	"errors"
