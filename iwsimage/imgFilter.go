@@ -59,3 +59,38 @@ func colorFilterGenerator(index int, value float64) func(imgData *ImageData) err
 		return nil
 	}
 }
+
+// OldGreenFilterGenerator returns a filter function for the red Color
+func OldGreenFilterGenerator(value float64) func(imgData *ImageData) error {
+	return oldColorFilterGenerator(1, value)
+}
+
+// OldBlueFilterGenerator returns a filter function for the red blue
+func OldBlueFilterGenerator(value float64) func(imgData *ImageData) error {
+	return oldColorFilterGenerator(0, value)
+}
+
+// OldRedFilterGenerator returns a filterfunction for the red Color
+func OldRedFilterGenerator(value float64) func(imgData *ImageData) error {
+	return oldColorFilterGenerator(2, value)
+}
+
+func oldColorFilterGenerator(index int, value float64) func(imgData *ImageData) error {
+	return func(imgData *ImageData) error {
+		if imgData.Width <= 0 || len(imgData.PixelData) <= 0 {
+			return errors.New("No Image Data")
+		}
+
+		maxColVal := 255.0
+		for i := 0; i < len(imgData.PixelData); i += imgData.Width * 3 {
+			start := i+index;
+			for l := start; l < (start + 3*imgData.Width); l += 3 {
+				colVal := float64(imgData.PixelData[l]) * value
+				imgData.PixelData[l] = int(math.Floor(math.Min(maxColVal, colVal)))
+			}
+		}
+
+		return nil
+	}
+}
+

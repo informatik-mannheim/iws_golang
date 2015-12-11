@@ -28,17 +28,17 @@ func main() {
 	
 	timeNow := time.Now()
 	for i := 0; i < numberOfRuns; i++ {
-		colorCollage(path.Join(dir, "/test/pictures/bridge.bmp"), path.Join(usr.HomeDir, "Desktop/bridgecollor.bmp"))
-	}
-	
-	timeNew := time.Since(timeNow).Nanoseconds() / int64(numberOfRuns)
-	
-	timeNow = time.Now()
-	for i := 0; i < numberOfRuns; i++ {
 		oldColorCollage(path.Join(dir, "/test/pictures/bridge.bmp"), path.Join(usr.HomeDir, "Desktop/bridgecollor.bmp"))
 	}
 	
 	timeOld := time.Since(timeNow).Nanoseconds() / int64(numberOfRuns)
+	
+	timeNow = time.Now()
+	for i := 0; i < numberOfRuns; i++ {
+		 colorCollage(path.Join(dir, "/test/pictures/bridge.bmp"), path.Join(usr.HomeDir, "Desktop/bridgecollor.bmp"))
+	}
+	
+	timeNew := time.Since(timeNow).Nanoseconds() / int64(numberOfRuns)
 	
 	
 	fmt.Println("average runtime(ns) -New:");
@@ -100,36 +100,36 @@ func oldColorCollage(src, dest string) {
 	imgData3 := imgData1.Copy()
 	imgData4 := imgData1.Copy()
 
-	imgData1.Filter(iwsimage.GreenFilterGenerator(1.2))
-	imgData1.Filter(iwsimage.RedFilterGenerator(0.7))
-	imgData1.Filter(iwsimage.BlueFilterGenerator(0.7))
+	imgData1.Filter(iwsimage.OldGreenFilterGenerator(1.2))
+	imgData1.Filter(iwsimage.OldRedFilterGenerator(0.7))
+	imgData1.Filter(iwsimage.OldBlueFilterGenerator(0.7))
 
 	dest1 := filepath.Join(filepath.Dir(dest), "img_1.bmp")
 	if err := imgData1.SaveFile(dest1); err != nil {
 		panic(err.Error())
 	}
 
-	imgData2.Filter(iwsimage.GreenFilterGenerator(0.7))
-	imgData2.Filter(iwsimage.RedFilterGenerator(1.8))
-	imgData2.Filter(iwsimage.BlueFilterGenerator(0.7))
+	imgData2.Filter(iwsimage.OldGreenFilterGenerator(0.7))
+	imgData2.Filter(iwsimage.OldRedFilterGenerator(1.8))
+	imgData2.Filter(iwsimage.OldBlueFilterGenerator(0.7))
 
 	dest2 := filepath.Join(filepath.Dir(dest), "img_2.bmp")
 	if err := imgData2.SaveFile(dest2); err != nil {
 		panic(err.Error())
 	}
 
-	imgData3.Filter(iwsimage.GreenFilterGenerator(0.7))
-	imgData3.Filter(iwsimage.RedFilterGenerator(0.7))
-	imgData3.Filter(iwsimage.BlueFilterGenerator(1.8))
+	imgData3.Filter(iwsimage.OldGreenFilterGenerator(0.7))
+	imgData3.Filter(iwsimage.OldRedFilterGenerator(0.7))
+	imgData3.Filter(iwsimage.OldBlueFilterGenerator(1.8))
 
 	dest3 := filepath.Join(filepath.Dir(dest), "img_3.bmp")
 	if err := imgData3.SaveFile(dest3); err != nil {
 		panic(err.Error())
 	}
 
-	imgData4.Filter(iwsimage.GreenFilterGenerator(0.3))
-	imgData4.Filter(iwsimage.RedFilterGenerator(1.6))
-	imgData4.Filter(iwsimage.BlueFilterGenerator(1.6))
+	imgData4.Filter(iwsimage.OldGreenFilterGenerator(0.3))
+	imgData4.Filter(iwsimage.OldRedFilterGenerator(1.6))
+	imgData4.Filter(iwsimage.OldBlueFilterGenerator(1.6))
 
 	dest4 := filepath.Join(filepath.Dir(dest), "img_4.bmp")
 	if err := imgData4.SaveFile(dest4); err != nil {
