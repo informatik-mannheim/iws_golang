@@ -40,7 +40,6 @@ func main() {
 	
 	timeNew := time.Since(timeNow).Nanoseconds() / int64(numberOfRuns)
 	
-	
 	fmt.Println("average runtime(ns) -New:");
 	fmt.Println(timeNew)
 	fmt.Println("average runtime(ns) -Old:");
