@@ -58,20 +58,17 @@ func colorCollage(src, dest string) {
 	imageChan := make(chan *iwsimage.ImageData, 4)
 	for i := 0; i < 4; i++ {
 		tmpDest := filepath.Join(filepath.Dir(dest), "img_" + strconv.Itoa(i+1) + "_p.bmp")
-		go func(filter []float64, isCopy bool) {
+		go func(filter []float64) {
 			var newImgData *iwsimage.ImageData
-			if(isCopy) {
-				newImgData = imgData.Copy()
-			} else {
-				newImgData = imgData;
-			}
+			newImgData = imgData.Copy()
+
 			newImgData.Filter(iwsimage.GreenFilterGenerator(filter[0]))
 			newImgData.Filter(iwsimage.RedFilterGenerator(filter[1]))
 			newImgData.Filter(iwsimage.BlueFilterGenerator(filter[2]))
 			
 			newImgData.SaveFile(tmpDest)
 			imageChan <- newImgData
-		}(colorCollection[i*3:i*3+3], i<3)
+		}(colorCollection[i*3:i*3+3])
 	}
 	
 	imgData1 := <- imageChan
@@ -89,14 +86,14 @@ func colorCollage(src, dest string) {
 
 func oldColorCollage(src, dest string) {
 
-	imgData1 := iwsimage.NewImageData()
-	if err := imgData1.LoadFile(src); err != nil {
+	imgDataOriginal := iwsimage.NewImageData()
+	if err := imgDataOriginal.LoadFile(src); err != nil {
 		panic(err.Error())
 	}
-
-	imgData2 := imgData1.Copy()
-	imgData3 := imgData1.Copy()
-	imgData4 := imgData1.Copy()
+	imgData1 := imgDataOriginal.Copy()
+	imgData2 := imgDataOriginal.Copy()
+	imgData3 := imgDataOriginal.Copy()
+	imgData4 := imgDataOriginal.Copy()
 
 	imgData1.Filter(iwsimage.OldGreenFilterGenerator(1.2))
 	imgData1.Filter(iwsimage.OldRedFilterGenerator(0.7))
