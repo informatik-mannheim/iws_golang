@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 	"strconv"
+	"sync"
 	"github.com/informatik-mannheim/iws_golang/iwsimage"
 )
 
@@ -27,14 +28,15 @@ func main() {
 	
 	timeNow := time.Now()
 	for i := 0; i < numberOfRuns; i++ {
-		oldColorCollage(path.Join(dir, "/test/pictures/bridge.bmp"), path.Join(usr.HomeDir, "Desktop/bridgecollor.bmp"))
+		
+		oldColorCollage(path.Join(dir, "bin/test/pictures/bridge.bmp"), path.Join(usr.HomeDir, "Desktop/bridgecollor.bmp"))
 	}
 	
 	timeOld := time.Since(timeNow).Nanoseconds() / int64(numberOfRuns)
 	
 	timeNow = time.Now()
 	for i := 0; i < numberOfRuns; i++ {
-		 colorCollage(path.Join(dir, "/test/pictures/bridge.bmp"), path.Join(usr.HomeDir, "Desktop/bridgecollor.bmp"))
+		 colorCollage(path.Join(dir, "bin/test/pictures/bridge.bmp"), path.Join(usr.HomeDir, "Desktop/bridgecollor.bmp"))
 	}
 	
 	timeNew := time.Since(timeNow).Nanoseconds() / int64(numberOfRuns)
@@ -56,19 +58,28 @@ func colorCollage(src, dest string) {
 	}
 	
 	imageChan := make(chan *iwsimage.ImageData, 4)
+	workCounter := sync.WaitGroup{}
+	imageChan <- imgData
+	for i := 0; i < 3; i++ {
+		workCounter.Add(1)
+		go func() {
+			defer workCounter.Done()
+			imageChan <- imgData.Copy()
+		}()
+	}
+	
+	workCounter.Wait();
+	
 	for i := 0; i < 4; i++ {
 		tmpDest := filepath.Join(filepath.Dir(dest), "img_" + strconv.Itoa(i+1) + "_p.bmp")
-		go func(filter []float64) {
-			var newImgData *iwsimage.ImageData
-			newImgData = imgData.Copy()
-
+		go func(filter []float64,  newImgData *iwsimage.ImageData) {
 			newImgData.Filter(iwsimage.GreenFilterGenerator(filter[0]))
 			newImgData.Filter(iwsimage.RedFilterGenerator(filter[1]))
 			newImgData.Filter(iwsimage.BlueFilterGenerator(filter[2]))
 			
 			newImgData.SaveFile(tmpDest)
 			imageChan <- newImgData
-		}(colorCollection[i*3:i*3+3])
+		}(colorCollection[i*3:i*3+3], <-imageChan)
 	}
 	
 	imgData1 := <- imageChan
@@ -86,14 +97,14 @@ func colorCollage(src, dest string) {
 
 func oldColorCollage(src, dest string) {
 
-	imgDataOriginal := iwsimage.NewImageData()
-	if err := imgDataOriginal.LoadFile(src); err != nil {
+	imgData1 := iwsimage.NewImageData()
+	if err := imgData1.LoadFile(src); err != nil {
 		panic(err.Error())
 	}
-	imgData1 := imgDataOriginal.Copy()
-	imgData2 := imgDataOriginal.Copy()
-	imgData3 := imgDataOriginal.Copy()
-	imgData4 := imgDataOriginal.Copy()
+
+	imgData2 := imgData1.Copy()
+	imgData3 := imgData1.Copy()
+	imgData4 := imgData1.Copy()
 
 	imgData1.Filter(iwsimage.OldGreenFilterGenerator(1.2))
 	imgData1.Filter(iwsimage.OldRedFilterGenerator(0.7))
