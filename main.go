@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/user"
@@ -40,12 +39,12 @@ func main() {
 	
 	timeNew := time.Since(timeNow).Nanoseconds() / int64(numberOfRuns)
 	
-	fmt.Println("average runtime(ns) -New:");
-	fmt.Println(timeNew)
-	fmt.Println("average runtime(ns) -Old:");
-	fmt.Println(timeOld)
+	log.Println("average runtime(ns) -New:");
+	log.Println(timeNew)
+	log.Println("average runtime(ns) -Old:");
+	log.Println(timeOld)
 	
-	fmt.Printf("Difference: %v ns\n", (timeOld - timeNew));
+	log.Printf("Difference: %v ns\n", (timeOld - timeNew));
 }
 
 func colorCollage(src, dest string) {
@@ -58,7 +57,7 @@ func colorCollage(src, dest string) {
 	
 	imageChan := make(chan *iwsimage.ImageData, 4)
 	for i := 0; i < 4; i++ {
-		tmpDest := filepath.Join(filepath.Dir(dest), "img_" + strconv.Itoa(i) + ".bmp")
+		tmpDest := filepath.Join(filepath.Dir(dest), "img_" + strconv.Itoa(i+1) + "_p.bmp")
 		go func(filter []float64, isCopy bool) {
 			var newImgData *iwsimage.ImageData
 			if(isCopy) {
