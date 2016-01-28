@@ -1,0 +1,17 @@
+<!--extent: layout/base-->
+{{define "content"}}
+<h1>{{.SampleString}}</h1>
+<form action="/upload" method="post" enctype="multipart/form-data">
+  <p> Wählen Sie eine Bildatei (*.btm) von Ihrem Rechner aus:
+    <br>
+    <input name="image" type="file" size="50" accept="Image/bmp">
+  </p>
+  <p>
+    <select name="filter">
+      <option value="gray">Gray</option>
+      <option value="color">Color</option>
+    </select>
+  </p>
+  <button type="submit">Filter</button>
+</form>
+{{end}}

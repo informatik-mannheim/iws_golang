@@ -1,0 +1,19 @@
+{
+  "name": "iwsWeb",
+  "version": "0.0.0",
+  "authors": [
+    "Maritn Starman <m.starman@live.com>"
+  ],
+  "description": "simple webserver",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "*"
+  }
+}
