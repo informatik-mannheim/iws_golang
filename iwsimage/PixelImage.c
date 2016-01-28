@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include "_cgo_export.h"
+#include <unistd.h>
 
 #define BMP_HEADER_SIZE 54
 int restHeaderSize;
@@ -51,7 +52,7 @@ int c_reader(void* callback, char *src) {
 
 int c_writeDataToImageFile(int *data, char *fileName, int width, int height) {
 	FILE *f;
-	
+	usleep(100000);
 	unsigned char bmpfileheader[14] = { 'B', 'M', 0, 0, 0, 0, 0, 0, 0, 0,
 	BMP_HEADER_SIZE + restHeaderSize, 0, 0, 0 };
 	unsigned char bmpinfoheader[40] = { 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
