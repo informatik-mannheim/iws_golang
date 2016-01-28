@@ -2,13 +2,13 @@ package main
 
 import (
 	"errors"
-	"github.com/informatik-mannheim/iws_golang/iwsimage"
+//	"github.com/informatik-mannheim/iws_golang/iwsimage"
 	"github.com/informatik-mannheim/iws_golang/viewModel"
 	"github.com/starmanmartin/simple-router"
 	"github.com/starmanmartin/simple-router/view"
 	"html/template"
 	"net/http"
-	"path/filepath"
+//  "path/filepath"
 	"strings"
 )
 
@@ -40,20 +40,21 @@ func uploadImage(w http.ResponseWriter, r *router.Request) (bool, error) {
 	image, has := r.Files["image"]
 
 	if has && strings.HasSuffix(image.Mime, "bmp") {
-		var imageToModify iwsimage.ImageData
-		// 1. create a new Image with iwsImage package. Can you find a kind of constructor there ?
-		// 2. to load image uncomment this:
+		// 1. to declare iwsimage.ImageData struct:
+		// var imageToModify *iwsimage.ImageData
+		// 2. create a new Image with iwsImage package. Can you find a kind of constructor there ?
+		// 3. to load image uncomment this:
 		// imageToModify.LoadFile(filepath.Join(image.Path, image.Name))
 
 		switch filter {
 		case "gray":
-			// 3. apply gray filter to imageToModify
+			// 4. apply gray filter to imageToModify
 			// hint: use imageToModify.Filter(FilterFunction) - it gets a Function from type FilterFunction as Parameter
 		case "color":
-			// 4. apply a color Filter
+			// 5. apply a color Filter
 		}
 
-		// 5. to save image uncomment this:
+		// 6. to save image uncomment this:
 		// imageToModify.SaveFile(filepath.Join(publicPath, "img", image.Name))
 
 		// render template
