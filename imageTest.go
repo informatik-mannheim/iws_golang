@@ -68,21 +68,23 @@ func optimizedColorCollage(src, dest string, colorCollection [4][3]float64) {
 		panic(err.Error())
 	}
 
-	imageChan := make(chan *iwsimage.ImageData, 4)
+	imageCopyChan := make(chan *iwsimage.ImageData, 4)
+    imageChan := make(chan *iwsimage.ImageData, 4)
 	workCounter := sync.WaitGroup{}
-	imageChan <- imgData
+	imageCopyChan <- imgData
 	for i := 0; i < 3; i++ {
 		workCounter.Add(1)
 		go func() {
 			defer workCounter.Done()
-			imageChan <- imgData.Copy()
+			imageCopyChan <- imgData.Copy()
 		}()
 	}
 
 	workCounter.Wait()
-
-	for i := 0; i < len(imageChan); i++ {
-		tmpDest := filepath.Join(filepath.Dir(dest), "img_"+strconv.Itoa(i+1)+"_modified.bmp")
+    chanLenght := len(imageCopyChan)
+    
+	for i := 0; i < chanLenght; i++ {
+		tmpDest := filepath.Join(filepath.Dir(dest), "img_"+strconv.Itoa(i+1)+"_optimized.bmp")
 		go func(filter [3]float64, newImgData *iwsimage.ImageData) {
 			newImgData.Filter(iwsimage.OldGreenFilterGenerator(filter[0]))
 			newImgData.Filter(iwsimage.OldRedFilterGenerator(filter[1]))
@@ -91,14 +93,17 @@ func optimizedColorCollage(src, dest string, colorCollection [4][3]float64) {
 			if err := newImgData.SaveFile(tmpDest); err != nil {
 				panic(err.Error())
 			}
+            
 			imageChan <- newImgData
-		}(colorCollection[i], <-imageChan)
+		}(colorCollection[i], <-imageCopyChan)
 	}
 
 	assembledImage := <-imageChan
 	assembledImage.AssembleLeft(<-imageChan)
-	imgData2 := <-imageChan
-	imgData2.AssembleLeft(<-imageChan)
+	imgDataTop := <-imageChan
+	imgDataTop.AssembleLeft(<-imageChan)
+    
+    assembledImage.AssembleTop(imgDataTop)
 
 	// Save assembled image
 	if err := assembledImage.SaveFile(dest); err != nil {
