@@ -14,10 +14,13 @@ import (
 
 // This is the main entry point for an image manipulation program
 func runImageTest() {
+
 	// defines how often the image manipulation is done
-	const numberOfRuns = 1
-	const srcPicturePath = "pictures/bridge.bmp"
-	const outputPicturePath = "Desktop/bridgecolored.bmp"
+	const (
+		numberOfRuns      = 3
+		srcPicturePath    = "pictures/bridge.bmp"
+		outputPicturePath = "Desktop/assembled_Bridge_Image.bmp"
+	)
 
 	colorCollection := [...][3]float64{{1.2, 0.7, 0.7}, {0.7, 1.8, 0.7}, {0.7, 0.7, 1.8}, {0.3, 1.6, 1.6}}
 
@@ -44,9 +47,9 @@ func runImageTest() {
 
 	timeNow = time.Now()
 	for i := 0; i < numberOfRuns; i++ {
-		//execute image manipulation again with with optimized algorithm
+		// execute image manipulation again with with optimized algorithm
 		// Optimize this version by using better goroutines
-//		colorCollage(path.Join(currentDir, srcPicturePath), path.Join(usr.HomeDir, outputPicturePath), colorCollection)
+		//		optimizedColorCollage(path.Join(currentDir, srcPicturePath), path.Join(usr.HomeDir, outputPicturePath), colorCollection)
 	}
 
 	// print the time difference between the runs
@@ -60,82 +63,83 @@ func runImageTest() {
 	log.Printf("Difference: %v ns\n", (timeOld - timeNew))
 }
 
-// optimized version
-func colorCollage(src, dest string, collerCollection [4][3]float64) {
+// modify here
+func optimizedColorCollage(src, dest string, collerCollection [4][3]float64) {
+
+	// 1. Ask yourself what parts of the algorithm in OldColorCollage could be faster concurrently
+	// 2. Use goroutines to spawn threads
+	// 3. Use Channels to communicate between goroutines
+	// 4. Find a way to synchronize the output of goroutines. Hint you could use sync.WaitGroup{} for that
 
 	imgData := iwsimage.NewImageData()
 	if err := imgData.LoadFile(src); err != nil {
 		panic(err.Error())
 	}
+	/**  Hints **/
+	// use channels to synchronize different goroutines without explicit locks or condition variables
+	// create a channel: make(chan datatype, buffersize)
+	// fill channel: chan <- input
+	// read out of channel: result := <- chan
+	// see also: https://tour.golang.org/concurrency/2
 
-	imageChan := make(chan *iwsimage.ImageData, 4)
-	//	workCounter := sync.WaitGroup{}
-	//	imageChan <- imgData
-	//	for i := 0; i < 3; i++ {
-	//		workCounter.Add(1)
-	//		go func() {
-	//			defer workCounter.Done()
-	//			imageChan <- imgData.Copy()
-	//		}()
+	// channel with pointers on ImageData
+	// imageChan := make(chan *iwsimage.ImageData, 4)
+
+	// We need 4 copies of the image: see func oldColorCollage for the operations
+
+	// We need three filter operations for each image
+	// And afterwards the image needs to be saved
+	// save all 4 images to desktop with:
+	// tmpDest := filepath.Join(filepath.Dir(dest), "img_" + strconv.Itoa(i+1) + "_modified.bmp")
+	// imgData.SaveFile(tmpDest)
+
+	// 	Assemble the images at the end as done in func oldColorCollage
+	//	imgData.AssembleLeft(<-imageChan)
+
+	// Save assembled image
+	//	if err := assembledImage.SaveFile(dest); err != nil {
+	//		panic(err.Error())
 	//	}
-
-	//	workCounter.Wait();
-
-	for i := 0; i < 4; i++ {
-		//		tmpDest := filepath.Join(filepath.Dir(dest), "img_" + strconv.Itoa(i+1) + "_p.bmp")
-		//		go func(filter []float64,  newImgData *iwsimage.ImageData) {
-		//			newImgData.Filter(iwsimage.GreenFilterGenerator(filter[0]))
-		//			newImgData.Filter(iwsimage.RedFilterGenerator(filter[1]))
-		//			newImgData.Filter(iwsimage.BlueFilterGenerator(filter[2]))
-
-		//			newImgData.SaveFile(tmpDest)
-		//			imageChan <- newImgData
-		//		}(colorCollection[i*3:i*3+3], <-imageChan)
-	}
-
-	imgData1 := <-imageChan
-	//
-	imgData1.AssembleLeft(<-imageChan)
-	//	imgData2 := <- imageChan
-	//	imgData2.AssembleLeft(<- imageChan)
-
-	//	imgData1.AssembleTop(imgData2)
-
-	if err := imgData1.SaveFile(dest); err != nil {
-		panic(err.Error())
-	}
 }
 
 // Gets a path to a source and destination bitmapfile
 // Creates four copies of the file and manipulates the color of each copy
-// Assembles the four changed pictures together and writes the final picture to dest
+// Assembles (=zusammenfügen) the four changed pictures together into one picture and writes the final picture to dest
 func oldColorCollage(src, dest string, colorCollection [4][3]float64) {
+
+	// read bitmap from given source
 	imgData := iwsimage.NewImageData()
 	if err := imgData.LoadFile(src); err != nil {
 		panic(err.Error())
 	}
 
+	// create working copies of the given image
 	imageList := [...]*iwsimage.ImageData{
 		imgData.Copy(),
 		imgData.Copy(),
 		imgData.Copy(),
 		imgData}
 
+	// runs colorfilters on each one of the images
 	for index, newImgData := range imageList {
 		newImgData.Filter(iwsimage.OldGreenFilterGenerator(colorCollection[index][0]))
 		newImgData.Filter(iwsimage.OldRedFilterGenerator(colorCollection[index][1]))
 		newImgData.Filter(iwsimage.OldBlueFilterGenerator(colorCollection[index][2]))
 		dest := filepath.Join(filepath.Dir(dest), "coloredImg_"+strconv.Itoa(index+1)+".bmp")
+		// save the filtered image to the desktop
 		if err := newImgData.SaveFile(dest); err != nil {
 			panic(err.Error())
 		}
 	}
 
-	imageList[0].AssembleLeft(imageList[1])
+	// assembles the 4 images together into one final image  
+	assembledImage := imageList[0]
+	assembledImage.AssembleLeft(imageList[1])
 	imageList[2].AssembleLeft(imageList[3])
-	imageList[0].AssembleTop(imageList[2])
+	assembledImage.AssembleTop(imageList[2])
 
-	if err := imageList[0].SaveFile(dest); err != nil {
+	// saves the assembled image to desktop
+	if err := assembledImage.SaveFile(dest); err != nil {
 		panic(err.Error())
 	}
 }

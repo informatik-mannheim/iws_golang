@@ -3,7 +3,7 @@ package iwsimage
 import (
 	"errors"
 	"math"
-	"sync"
+	_"sync"
 )
 
 // FilterFunction defines a function signature for image filters
@@ -28,45 +28,6 @@ func GrayFilter(imgData *ImageData) error {
 	return nil
 }
 
-// GreenFilterGenerator returns a filter function for the red Color
-func GreenFilterGenerator(value float64) FilterFunction {
-	return colorFilterGenerator(1, value)
-}
-
-// BlueFilterGenerator returns a filter function for the red blue
-func BlueFilterGenerator(value float64) FilterFunction {
-	return colorFilterGenerator(0, value)
-}
-
-// RedFilterGenerator returns a filterfunction for the red Color
-func RedFilterGenerator(value float64) FilterFunction {
-	return colorFilterGenerator(2, value)
-}
-
-func colorFilterGenerator(index int, value float64) FilterFunction {
-	return func(imgData *ImageData) error {
-		if imgData.Width <= 0 || len(imgData.PixelData) <= 0 {
-			return errors.New("No Image Data")
-		}
-		
-		workerList := sync.WaitGroup{}
-		maxColVal := 255.0
-		for i := 0; i < len(imgData.PixelData); i += imgData.Height * 3 {
-			workerList.Add(1)
-			go func(start int, imgData *ImageData) {
-				defer workerList.Done()
-				for l := start; l < (start + 3*imgData.Height); l += 3 {
-					colVal := float64(imgData.PixelData[l]) * value
-					imgData.PixelData[l] = int(math.Floor(math.Min(maxColVal, colVal)))
-				}
-
-			}(i+index, imgData)
-		}
-
-		workerList.Wait()
-		return nil
-	}
-}
 
 // OldGreenFilterGenerator returns a filter function for the red Color
 func OldGreenFilterGenerator(value float64) FilterFunction {
@@ -83,6 +44,8 @@ func OldRedFilterGenerator(value float64) FilterFunction {
 	return oldColorFilterGenerator(2, value)
 }
 
+// Advanced topic:
+// you might be able to optimize this function with concurrency
 func oldColorFilterGenerator(index int, value float64) FilterFunction {
 	return func(imgData *ImageData) error {
 		if imgData.Width <= 0 || len(imgData.PixelData) <= 0 {
