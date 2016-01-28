@@ -2,11 +2,6 @@ package iwsimage
 
 import (
 	"math"
-	"sync"
-)
-
-const (
-	maxWorker = 100
 )
 
 // ImageData is a struct containing all image handle PixelData PixelData
@@ -16,7 +11,6 @@ type ImageData struct {
 	PixelData  []int
 	Width      int
 	Height     int
-	workerList sync.WaitGroup
 }
 
 // NewImageData returns new instance of ImageData
@@ -103,6 +97,6 @@ func (d *ImageData) LoadFile(src string) error {
 }
 
 // Filter runs a Filter at the image data. The filter gets past as parameter
-func (d *ImageData) Filter(filter func(*ImageData) error) error {
+func (d *ImageData) Filter(filter FilterFunction) error {
 	return filter(d)
 }

@@ -12,10 +12,10 @@ import (
 	"github.com/informatik-mannheim/iws_golang/iwsimage"
 )
 
-var numberOfRuns = 3
+var numberOfRuns = 1
 
 func main() {
-
+	
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
